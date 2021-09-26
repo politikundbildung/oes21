@@ -1,0 +1,65 @@
+# Daten: Jankowski, Michael; Stecker, Christian; Blätte, Andreas; Bräuninger, Thomas; Debus, Marc; Kurella, Anna-Sophie; Müller, Jochen; Pickel, Susanne, 2021, 
+# “Open Expert Survey 2021”, https://doi.org/10.7910/DVN/XIL6OW, Harvard Dataverse, V1.
+
+
+library(readr)
+library(tidyverse)
+library(data.table)
+library(gridExtra)
+library(scales)
+setwd("(pfad_zur_Datei")
+oes <- read_rds("oes21_raw_expert_positions.rds")
+
+##Analyse
+#Parteinahmen, da nur eine Skala verwendet wird
+theorie_plot <- rename(oes, CDU = leftrightgeneral_cdu, 
+                            CSU = leftrightgeneral_csu,
+                            SPD = leftrightgeneral_spd,
+                            AfD = leftrightgeneral_afd ,
+                            FDP = leftrightgeneral_fdp,
+                            Linke = leftrightgeneral_linke, 
+                            Gruene = leftrightgeneral_gruene,
+                            fw =leftrightgeneral_fw)
+#Ins richtige Format für ggplot2 bringen
+theorie_plot <- melt(theorie_plot, measure.vars = c("CDU", "CSU", "SPD", "AfD","FDP", "Linke","Gruene"), value.name="val", variable.name="var")  
+
+##Theorie
+#Boxplot
+theorieplot <- ggplot(theorie_plot, aes(y=var, x=val, fill=as.factor(subfield_theory)))+
+    geom_boxplot() +
+    labs(x = "Einschätzung", y = "Partei", title="Einordnung der Parteien auf links-rechts-Skala durch Vertreter*innen der Politischen Theorie") +
+    scale_fill_discrete(name = "Subdisziplin", labels=c("Alle Anderen", "PolTheo")) 
+    
+ggsave("theorie.png", theorieplot,  width=10, height=5)
+
+#Histogramme
+theorieplots <- ggplot(theorie_plot, aes(x=val, color=as.factor(subfield_theory)))+
+    geom_histogram(binwidth=1, fill="white", aes(y=..density..)) +
+    labs(x = "Einschätzung", y = element_blank(), title="Einordnung der Parteien auf links-rechts-Skala durch Vertreter*innen der Politischen Theorie") +
+    scale_color_discrete(name = "Subdisziplin", labels=c("Alle Anderen", "PolTheo")) +
+    theme(axis.text.y = element_blank(),
+          axis.ticks=element_blank())+
+    facet_grid(var ~ .)
+    
+ggsave("theories.png", theorieplots,  width=10, height=7)
+
+    
+##Politische Bildung
+#Boxplot
+polbild <- ggplot(theorie_plot, aes(y=var, x=val, fill=as.factor(subfield_polbild)))+
+    geom_boxplot() +
+    labs(x = "Einschätzung", y = "Partei", title="Einordnung der Parteien auf links-rechts-Skala durch Vertreter*innen der Politischen Bildung") +
+    scale_fill_discrete(name = "Subdisziplin", labels=c("Alle Anderen", "Pol. Bildung"))
+    
+ggsave("polbild.png", plot=polbild, width=10, height=5)
+
+#Histogramme
+theorieplots <- ggplot(theorie_plot, aes(x=val, color=as.factor(subfield_polbild)))+
+    geom_histogram(binwidth=1, fill="white", aes(y=..density..)) +
+    labs(x = "Einschätzung", y = element_blank(), title="Einordnung der Parteien auf links-rechts-Skala durch Vertreter*innen der Politischen Bildung") +
+    scale_color_discrete(name = "Subdisziplin", labels=c("Alle Anderen", "Pol. Bildung")) +
+    theme(axis.text.y = element_blank(),
+          axis.ticks=element_blank())+
+    facet_grid(var ~ .)
+    
+ggsave("bildungen.png", theorieplots,  width=10, height=7)
