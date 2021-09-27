@@ -11,7 +11,7 @@ setwd("(pfad_zur_Datei")
 oes <- read_rds("oes21_raw_expert_positions.rds")
 
 ##Analyse
-#Parteinahmen, da nur eine Skala verwendet wird
+#Parteinamen, da nur eine Skala verwendet wird
 theorie_plot <- rename(oes, CDU = leftrightgeneral_cdu, 
                             CSU = leftrightgeneral_csu,
                             SPD = leftrightgeneral_spd,
